@@ -1,6 +1,7 @@
 module PhotoGroove exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
 
 view model =
   div [ class "content" ]
@@ -16,6 +17,7 @@ view model =
 viewThumbnail selectedUrl photo =
     img [ src ("img/thumb/" ++ photo.url)
           , classList [ ( "selected", selectedUrl == photo.url ) ]
+          , onClick (Select photo.url)
           ]
           []
 
@@ -28,5 +30,17 @@ initialModel =
     , selectedUrl = "1.jpg"
   }
 
+type Message =
+  Select String
+
+update message model =
+  case message of
+    Select url ->
+      { model | selectedUrl = url }
+
 main =
-  view initialModel
+  Html.beginnerProgram
+  { model = initialModel
+  , view = view
+  , update = update
+  }
