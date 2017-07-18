@@ -3,6 +3,12 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 
+type Message = Select String
+
+type alias Photo = { url : String }
+type alias Model = { photos : List Photo, selectedUrl : String }
+
+view : Model -> Html Message
 view model =
   div [ class "content" ]
       [ h1 [] [ text "Photo Groove" ]
@@ -14,6 +20,7 @@ view model =
             []
       ]
 
+viewThumbnail : String -> Photo -> Html Message
 viewThumbnail selectedUrl photo =
     img [ src ("img/thumb/" ++ photo.url)
           , classList [ ( "selected", selectedUrl == photo.url ) ]
@@ -21,6 +28,7 @@ viewThumbnail selectedUrl photo =
           ]
           []
 
+initialModel : Model
 initialModel =
   { photos =
     [ { url = "1.jpg" }
@@ -30,9 +38,7 @@ initialModel =
     , selectedUrl = "1.jpg"
   }
 
-type Message =
-  Select String
-
+update : Message -> Model -> Model
 update message model =
   case message of
     Select url ->
