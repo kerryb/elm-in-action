@@ -4,6 +4,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 
 type Message = Select String
+             | Surprise
 
 type alias Photo = { url : String }
 type alias Model = { photos : List Photo, selectedUrl : String }
@@ -12,6 +13,7 @@ view : Model -> Html Message
 view model =
   div [ class "content" ]
       [ h1 [] [ text "Photo Groove" ]
+      , button [ onClick Surprise ] [ text "Surprise me!" ]
       , div [ id "thumbnails" ]
             (List.map (viewThumbnail model.selectedUrl) model.photos)
       , img [ src ("img/full/" ++ model.selectedUrl)
@@ -43,6 +45,8 @@ update message model =
   case message of
     Select url ->
       { model | selectedUrl = url }
+    Surprise ->
+      { model | selectedUrl = "2.jpg" }
 
 main =
   Html.beginnerProgram
