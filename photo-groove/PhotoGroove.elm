@@ -2,19 +2,32 @@ module PhotoGroove exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import Array exposing (get, fromList)
 
 type Message = Select String
              | Surprise
+             | ChangeThumbnailSize ThumbnailSize
+
+type ThumbnailSize = Small
+                   | Medium
+                   | Large
 
 type alias Photo = { url : String }
-type alias Model = { photos : List Photo, selectedUrl : String }
+
+type alias Model = { photos : List Photo
+                   , selectedUrl : String
+                   , thumbnailSize : ThumbnailSize
+                   }
 
 view : Model -> Html Message
 view model =
   div [ class "content" ]
       [ h1 [] [ text "Photo Groove" ]
       , button [ onClick Surprise ] [ text "Surprise me!" ]
-      , div [ id "thumbnails" ]
+      , h3 [] [text "Thumbnail size" ]
+      , div [ id "choose-size" ]
+            (List.map viewSizeChooser [ Small, Medium, Large ])
+      , div [ id "thumbnails", class (thumbnailSizeClass model.thumbnailSize) ]
             (List.map (viewThumbnail model.selectedUrl) model.photos)
       , img [ src ("img/full/" ++ model.selectedUrl)
             , class "large"
@@ -30,6 +43,28 @@ viewThumbnail selectedUrl photo =
           ]
           []
 
+viewSizeChooser : ThumbnailSize -> Html Message
+viewSizeChooser size =
+  label []
+        [ input [ type_ "radio", name "size", onClick (ChangeThumbnailSize size)] []
+        , text (sizeToString size)
+        , text " "
+        ]
+
+sizeToString : ThumbnailSize -> String
+sizeToString size =
+  case size of
+    Small -> "S"
+    Medium -> "M"
+    Large -> "L"
+
+thumbnailSizeClass : ThumbnailSize -> String
+thumbnailSizeClass size =
+  case size of
+    Small -> "small"
+    Medium -> "med"
+    Large -> "large"
+
 initialModel : Model
 initialModel =
   { photos =
@@ -38,7 +73,17 @@ initialModel =
     , { url = "3.jpg" }
     ]
     , selectedUrl = "1.jpg"
+    , thumbnailSize = Medium
   }
+
+photos : Array.Array Photo
+photos = Array.fromList initialModel.photos
+
+getPhotoUrl : Int -> String
+getPhotoUrl index =
+  case Array.get index photos of
+    Just photo -> photo.url
+    Nothing -> ""
 
 update : Message -> Model -> Model
 update message model =
@@ -47,6 +92,8 @@ update message model =
       { model | selectedUrl = url }
     Surprise ->
       { model | selectedUrl = "2.jpg" }
+    ChangeThumbnailSize size ->
+      { model | thumbnailSize = size }
 
 main =
   Html.beginnerProgram
