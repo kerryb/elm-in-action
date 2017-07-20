@@ -1,8 +1,9 @@
 module PhotoGroove exposing (..)
+import Array exposing (get, fromList)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
-import Array exposing (get, fromList)
+import Random
 
 type Message = Select String
              | Surprise
@@ -87,6 +88,9 @@ getPhotoUrl index =
   case Array.get index photos of
     Just photo -> photo.url
     Nothing -> ""
+
+randomPhotoPicker : Random.Generator Int
+randomPhotoPicker = Random.int 0 (Array.length photos - 1)
 
 update : Message -> Model -> Model
 update message model =
