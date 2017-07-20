@@ -5,7 +5,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Random
 
-type Msg = Select String
+type Msg = SelectByUrl String
+         | SelectByIndex Int
          | Surprise
          | ChangeThumbnailSize ThumbnailSize
 
@@ -40,7 +41,7 @@ viewThumbnail : String -> Photo -> Html Msg
 viewThumbnail selectedUrl photo =
     img [ src ("img/thumb/" ++ photo.url)
           , classList [ ( "selected", selectedUrl == photo.url ) ]
-          , onClick (Select photo.url)
+          , onClick (SelectByUrl photo.url)
           ]
           []
 
@@ -92,19 +93,22 @@ getPhotoUrl index =
 randomPhotoPicker : Random.Generator Int
 randomPhotoPicker = Random.int 0 (Array.length photos - 1)
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update message model =
   case message of
-    Select url ->
-      { model | selectedUrl = url }
+    SelectByUrl url ->
+      ( { model | selectedUrl = url }, Cmd.none)
+    SelectByIndex index ->
+      ( { model | selectedUrl = getPhotoUrl index }, Cmd.none)
     Surprise ->
-      { model | selectedUrl = "2.jpg" }
+      ( model, Random.generate SelectByIndex randomPhotoPicker )
     ChangeThumbnailSize size ->
-      { model | thumbnailSize = size }
+      ( { model | thumbnailSize = size }, Cmd.none)
 
 main =
-  Html.beginnerProgram
-  { model = initialModel
+  Html.program
+  { init = ( initialModel, Cmd.none )
   , view = view
   , update = update
+  , subscriptions = (\model -> Sub.none)
   }
