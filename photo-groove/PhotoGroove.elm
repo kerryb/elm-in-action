@@ -5,9 +5,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Random
 
-type Message = Select String
-             | Surprise
-             | ChangeThumbnailSize ThumbnailSize
+type Msg = Select String
+         | Surprise
+         | ChangeThumbnailSize ThumbnailSize
 
 type ThumbnailSize = Small
                    | Medium
@@ -20,7 +20,7 @@ type alias Model = { photos : List Photo
                    , thumbnailSize : ThumbnailSize
                    }
 
-view : Model -> Html Message
+view : Model -> Html Msg
 view model =
   div [ class "content" ]
       [ h1 [] [ text "Photo Groove" ]
@@ -36,7 +36,7 @@ view model =
             []
       ]
 
-viewThumbnail : String -> Photo -> Html Message
+viewThumbnail : String -> Photo -> Html Msg
 viewThumbnail selectedUrl photo =
     img [ src ("img/thumb/" ++ photo.url)
           , classList [ ( "selected", selectedUrl == photo.url ) ]
@@ -44,7 +44,7 @@ viewThumbnail selectedUrl photo =
           ]
           []
 
-viewSizeChooser : ThumbnailSize -> ThumbnailSize -> Html Message
+viewSizeChooser : ThumbnailSize -> ThumbnailSize -> Html Msg
 viewSizeChooser currentSize size =
   label []
         [ input [ type_ "radio", name "size"
@@ -92,7 +92,7 @@ getPhotoUrl index =
 randomPhotoPicker : Random.Generator Int
 randomPhotoPicker = Random.int 0 (Array.length photos - 1)
 
-update : Message -> Model -> Model
+update : Msg -> Model -> Model
 update message model =
   case message of
     Select url ->
